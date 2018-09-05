@@ -77,12 +77,37 @@ odoo.define('odtree', function (require) {
                     || (JSON.stringify(treejson) !== JSON.stringify(treejson_cur))) {
                     last_view_id = view.fields_view.view_id;
                     view.getParent().$('.o_list_view_categ').remove();
-                    treejson = treejson_cur;
+                    view.getParent().$('.o_kanban_view').addClass(' col-xs-12 col-md-10');
+                    treejson=treejson_cur;
+
                     var fragment = document.createDocumentFragment();
                     var content = qweb.render('Odtree');
                     $(content).appendTo(fragment);
                     view.getParent().$el.prepend(fragment);
                     treeObj = $.fn.zTree.init(view.getParent().$('.ztree'), setting, treejson);
+
+                    //hidden button bind action
+
+                    view.getParent().$(".handle_menu_arrow").on('click', function (e) {
+                       //change icon and reverse catgtree's display prop
+
+                       if ( view.getParent().$('.handle_menu_arrow').hasClass("handle_menu_arrow_left")){
+                            view.getParent().$('.handle_menu_arrow').removeClass("handle_menu_arrow_left");
+                            view.getParent().$('.handle_menu_arrow').addClass("handle_menu_arrow_right");
+                            view.getParent().$('.ztree').css("display","none");
+                            view.getParent().$('.o_list_view_categ').removeClass('col-xs-12 col-md-2');
+                            view.getParent().$('.o_list_view_categ').addClass('o_list_view_categ_hidden');
+                            view.getParent().$('.o_kanban_view').removeClass(' col-xs-12 col-md-10');
+
+                       }else{
+                            view.getParent().$('.handle_menu_arrow').removeClass("handle_menu_arrow_right");
+                            view.getParent().$('.handle_menu_arrow').addClass("handle_menu_arrow_left");
+                            view.getParent().$('.ztree').css("display","block");
+                            view.getParent().$('.o_list_view_categ').removeClass('o_list_view_categ_hidden');
+                            view.getParent().$('.o_list_view_categ').addClass('col-xs-12 col-md-2');
+                            view.getParent().$('.o_kanban_view').addClass(' col-xs-12 col-md-10');
+                       }
+                    });
                 }
                 if (node_id_selected != null && node_id_selected > 0) {
                     var node = treeObj.getNodeByParam('id', node_id_selected, null);
@@ -108,12 +133,12 @@ odoo.define('odtree', function (require) {
         },
 
         load_list: function () {
-            var self = this;
             var result = this._super.apply(this, arguments);
+            var self = this;
             if (this.fields_view.arch.attrs.categ_property && this.fields_view.arch.attrs.categ_model) {
                 this.$('.table-responsive').addClass("o_list_view_width_withcateg");
                 this.$('.table-responsive').css("overflow-x", "auto");
-                buildTree(self, self.fields_view.arch.attrs.categ_model, self.fields_view.arch.attrs.categ_parent_key);
+                buildTree(this, this.fields_view.arch.attrs.categ_model, this.fields_view.arch.attrs.categ_parent_key);
             } else {
                 this.getParent().$('.o_list_view_categ').remove();
             }
@@ -134,16 +159,16 @@ odoo.define('odtree', function (require) {
         },
 
         render: function () {
-            var self = this;
             var result = this._super.apply(this, arguments);
             if (this.fields_view.arch.attrs.categ_property && this.fields_view.arch.attrs.categ_model) {
-                buildTree(self, self.fields_view.arch.attrs.categ_model, self.fields_view.arch.attrs.categ_parent_key);
+                buildTree(this, this.fields_view.arch.attrs.categ_model, this.fields_view.arch.attrs.categ_parent_key);
             } else {
                 this.getParent().$('.o_list_view_categ').remove();
             }
             return result;
         }
     });
+
 
 
 });
