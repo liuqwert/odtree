@@ -19,9 +19,10 @@ odoo.define('odtree', function (require) {
     var treejson = [];
     var treeObj;
     var last_view_id;
+    var acitve_view;
 
     var buildTree = function (view, categ_model, categ_parent_key) {
-
+        acitve_view=view;
         var setting = {
             data: {
                 simpleData: {
@@ -129,9 +130,9 @@ odoo.define('odtree', function (require) {
         do_search: function (domain, context, group_by) {
             if (this.fields_view.arch.attrs.categ_property && this.fields_view.arch.attrs.categ_model) {
                 if (node_id_selected != null && node_id_selected > 0) {
-                    var include_children = this.getParent().$('#include_children').get(0).checked;
-                    var oparetion = include_children ? 'child_of' : '=';
-                    arguments[0][arguments[0].length] = [this.fields_view.arch.attrs.categ_property, oparetion, node_id_selected];
+                    var include_children = acitve_view.getParent().$('#include_children').get(0).checked;
+                    var operation = include_children ? 'child_of' : '=';
+                    arguments[0][arguments[0].length] = [this.fields_view.arch.attrs.categ_property, operation, node_id_selected];
                 }
             }
             return this._super.apply(this, arguments);
@@ -157,9 +158,9 @@ odoo.define('odtree', function (require) {
         do_search: function (domain, context, group_by) {
             if (this.fields_view.arch.attrs.categ_property && this.fields_view.arch.attrs.categ_model) {
                 if (node_id_selected != null && node_id_selected > 0) {
-                    var include_children = this.getParent().$('#include_children').get(0).checked;
-                    var oparetion = include_children ? 'child_of' : '=';                    
-                    arguments[0][arguments[0].length] = [this.fields_view.arch.attrs.categ_property, oparetion, node_id_selected];
+                    var include_children = acitve_view.getParent().$('#include_children').get(0).checked;
+                    var operation = include_children ? 'child_of' : '=';
+                    arguments[0][arguments[0].length] = [this.fields_view.arch.attrs.categ_property, operation, node_id_selected];
                 }
             }
             return this._super.apply(this, arguments);
