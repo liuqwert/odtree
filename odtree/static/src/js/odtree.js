@@ -42,8 +42,8 @@ odoo.define('odtree', function (require) {
                     if (categ_property && categ_model) {
                         if (node_id_selected != null && node_id_selected > 0) {
                             var include_children = renderer.getParent().$('#include_children').get(0).checked;
-                            var oparetion = include_children ? 'child_of' : '=';
-                            domains[domains.length] = [[categ_property, oparetion, node_id_selected]];
+                            var operation = include_children ? 'child_of' : '=';
+                            domains[domains.length] = [[categ_property, operation, node_id_selected]];
                         }
                     }
                     search_view.trigger_up('search', search_data);
