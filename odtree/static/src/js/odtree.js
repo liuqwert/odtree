@@ -42,8 +42,6 @@ odoo.define('odtree', function (require) {
                     if (categ_property && categ_model) {
                         if (node_id_selected != null && node_id_selected > 0) {
                             var include_children = renderer.getParent().$('#include_children').get(0).checked;
-                            console.log(renderer.getParent().$('#include_children'));
-                            console.log('include_children:'+include_children);
                             var oparetion = include_children ? 'child_of' : '=';
                             domains[domains.length] = [[categ_property, oparetion, node_id_selected]];
                         }
