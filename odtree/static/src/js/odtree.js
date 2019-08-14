@@ -92,21 +92,24 @@ odoo.define('odtree', function (require) {
                        //change icon and reverse catgtree's display prop
 
                        if ( view.getParent().$('.handle_menu_arrow').hasClass("handle_menu_arrow_left")){
-                            view.getParent().$('.handle_menu_arrow').removeClass("handle_menu_arrow_left");
-                            view.getParent().$('.handle_menu_arrow').addClass("handle_menu_arrow_right");
-                            view.getParent().$('.ztree').css("display","none");
-                            view.getParent().$('.o_list_view_categ').removeClass('col-xs-12 col-md-2');
-                            view.getParent().$('.o_list_view_categ').addClass('o_list_view_categ_hidden');
-                            view.getParent().$('.o_kanban_view').removeClass(' col-xs-12 col-md-10');
-
-                       }else{
-                            view.getParent().$('.handle_menu_arrow').removeClass("handle_menu_arrow_right");
-                            view.getParent().$('.handle_menu_arrow').addClass("handle_menu_arrow_left");
-                            view.getParent().$('.ztree').css("display","block");
-                            view.getParent().$('.o_list_view_categ').removeClass('o_list_view_categ_hidden');
-                            view.getParent().$('.o_list_view_categ').addClass('col-xs-12 col-md-2');
-                            view.getParent().$('.o_kanban_view').addClass(' col-xs-12 col-md-10');
-                       }
+                                view.getParent().$('.odtree_control_panel').css("display","none");
+                                view.getParent().$('.o_list_view_categ').css("border-right", "0px");
+                                view.getParent().$('.handle_menu_arrow').removeClass("handle_menu_arrow_left");
+                                view.getParent().$('.handle_menu_arrow').addClass("handle_menu_arrow_right");
+                                view.getParent().$('.ztree').css("display","none");
+                                view.getParent().$('.o_list_view_categ').removeClass('col-xs-12 col-md-2');
+                                view.getParent().$('.o_list_view_categ').addClass('o_list_view_categ_hidden');
+                                view.getParent().$('.o_kanban_view').removeClass(' col-xs-12 col-md-10');
+                        }else{
+                                view.getParent().$('.odtree_control_panel').css("display","block");
+                                view.getParent().$('.o_list_view_categ').css({"border-right": "1px solid #b9b9b9"});
+                                view.getParent().$('.handle_menu_arrow').removeClass("handle_menu_arrow_right");
+                                view.getParent().$('.handle_menu_arrow').addClass("handle_menu_arrow_left");
+                                view.getParent().$('.ztree').css("display","block");
+                                view.getParent().$('.o_list_view_categ').removeClass('o_list_view_categ_hidden');
+                                view.getParent().$('.o_list_view_categ').addClass('col-xs-12 col-md-2');
+                                view.getParent().$('.o_kanban_view').addClass(' col-xs-12 col-md-10');
+                        }
                     });
                 }
                 if (node_id_selected != null && node_id_selected > 0) {
@@ -126,7 +129,9 @@ odoo.define('odtree', function (require) {
         do_search: function (domain, context, group_by) {
             if (this.fields_view.arch.attrs.categ_property && this.fields_view.arch.attrs.categ_model) {
                 if (node_id_selected != null && node_id_selected > 0) {
-                    arguments[0][arguments[0].length] = [this.fields_view.arch.attrs.categ_property, '=', node_id_selected];
+                    var include_children = this.getParent().$('#include_children').get(0).checked;
+                    var oparetion = include_children ? 'child_of' : '=';
+                    arguments[0][arguments[0].length] = [this.fields_view.arch.attrs.categ_property, oparetion, node_id_selected];
                 }
             }
             return this._super.apply(this, arguments);
@@ -152,7 +157,9 @@ odoo.define('odtree', function (require) {
         do_search: function (domain, context, group_by) {
             if (this.fields_view.arch.attrs.categ_property && this.fields_view.arch.attrs.categ_model) {
                 if (node_id_selected != null && node_id_selected > 0) {
-                    arguments[0][arguments[0].length] = [this.fields_view.arch.attrs.categ_property, '=', node_id_selected];
+                    var include_children = this.getParent().$('#include_children').get(0).checked;
+                    var oparetion = include_children ? 'child_of' : '=';                    
+                    arguments[0][arguments[0].length] = [this.fields_view.arch.attrs.categ_property, oparetion, node_id_selected];
                 }
             }
             return this._super.apply(this, arguments);
