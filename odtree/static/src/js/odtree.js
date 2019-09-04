@@ -12,7 +12,7 @@ odoo.define('odtree', function (require) {
     var ListView = require('web.ListView');
     var KanbanView = require('web_kanban.KanbanView');
     //var data = require('web.data');
-    //var pyeval = require('web.pyeval');
+    var pyeval = require('web.pyeval');
     var qweb = core.qweb;
 
     var node_id_selected = 0;
@@ -21,7 +21,7 @@ odoo.define('odtree', function (require) {
     var last_view_id;
     var acitve_view;
 
-    var buildTree = function (view, categ_model, categ_parent_key) {
+    var buildTree = function (view, categ_model, categ_parent_key, categ_model_domain) {
         acitve_view=view;
         var setting = {
             data: {
@@ -43,19 +43,26 @@ odoo.define('odtree', function (require) {
         if (categ_parent_key != null) {
             fields.push(categ_parent_key);
         }
-        var ctx = view.dataset.get_context().__contexts[0] || {};
+        //var ctx = view.dataset.get_context().__contexts[0] || {};
+        var ctx = view.dataset.context || {};
 //        var ctx = pyeval.eval(
 //            'context', new data.CompoundContext(
 //                view.dataset.get_context(), {}));
 
+        if (categ_model_domain && categ_model_domain.indexOf('active_id')>0 && ctx.active_id){
+            categ_model_domain=categ_model_domain.replace(/active_id/g,ctx.active_id);
+        }
+
+
+        categ_model_domain = pyeval.eval('domain', categ_model_domain || []);
         ajax.jsonRpc('/web/dataset/call_kw', 'call', {
             model: categ_model,
             method: 'search_read',
             args: [],
             kwargs: {
-                domain: [],
+                domain: categ_model_domain,
                 fields: fields,
-                order: 'id asc',
+                // order: 'id asc',
                 context: ctx
             }
         }).then(function (respdata) {
@@ -130,7 +137,8 @@ odoo.define('odtree', function (require) {
         do_search: function (domain, context, group_by) {
             if (this.fields_view.arch.attrs.categ_property && this.fields_view.arch.attrs.categ_model) {
                 if (node_id_selected != null && node_id_selected > 0) {
-                    var include_children = acitve_view.getParent().$('#include_children').get(0).checked;
+                    var checkbox = this.getParent().$('#include_children').get(0);
+                    var include_children = checkbox && checkbox.checked;
                     var operation = include_children ? 'child_of' : '=';
                     arguments[0][arguments[0].length] = [this.fields_view.arch.attrs.categ_property, operation, node_id_selected];
                 }
@@ -144,7 +152,7 @@ odoo.define('odtree', function (require) {
             if (this.fields_view.arch.attrs.categ_property && this.fields_view.arch.attrs.categ_model) {
                 this.$('.table-responsive').addClass("o_list_view_width_withcateg");
                 this.$('.table-responsive').css("overflow-x", "auto");
-                buildTree(this, this.fields_view.arch.attrs.categ_model, this.fields_view.arch.attrs.categ_parent_key);
+                buildTree(this, this.fields_view.arch.attrs.categ_model, this.fields_view.arch.attrs.categ_parent_key, this.fields_view.arch.attrs.categ_model_domain);
             } else {
                 this.getParent().$('.o_list_view_categ').remove();
             }
@@ -158,7 +166,8 @@ odoo.define('odtree', function (require) {
         do_search: function (domain, context, group_by) {
             if (this.fields_view.arch.attrs.categ_property && this.fields_view.arch.attrs.categ_model) {
                 if (node_id_selected != null && node_id_selected > 0) {
-                    var include_children = acitve_view.getParent().$('#include_children').get(0).checked;
+                    var checkbox = this.getParent().$('#include_children').get(0);
+                    var include_children = checkbox && checkbox.checked;
                     var operation = include_children ? 'child_of' : '=';
                     arguments[0][arguments[0].length] = [this.fields_view.arch.attrs.categ_property, operation, node_id_selected];
                 }
@@ -169,7 +178,7 @@ odoo.define('odtree', function (require) {
         render: function () {
             var result = this._super.apply(this, arguments);
             if (this.fields_view.arch.attrs.categ_property && this.fields_view.arch.attrs.categ_model) {
-                buildTree(this, this.fields_view.arch.attrs.categ_model, this.fields_view.arch.attrs.categ_parent_key);
+                buildTree(this, this.fields_view.arch.attrs.categ_model, this.fields_view.arch.attrs.categ_parent_key, this.fields_view.arch.attrs.categ_model_domain);
             } else {
                 this.getParent().$('.o_list_view_categ').remove();
             }
