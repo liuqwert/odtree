@@ -50,6 +50,13 @@ odoo.define('odtree', function (require) {
                 }
             }
         };
+        if (controller.searchView==undefined){
+            $('.o_list_view_categ').hide();
+            return true
+
+        }
+
+
         var fields = ['id', 'name'];
         if (categ_parent_key != null) {
             fields.push(categ_parent_key);
